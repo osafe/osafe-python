@@ -16,7 +16,11 @@ setup(
     author="Oded Niv",
     author_email="oded.niv@gmail.com",
     packages=find_packages(),
-    install_requires=[],
+    install_requires=[
+        'cached-property',
+        'pycrypto',
+        'google-api-python-client',
+    ],
     long_description=long_description,
     classifiers=[
         "Programming Language :: Python",
