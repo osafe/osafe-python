@@ -44,6 +44,11 @@ class DriveStorageFormat(StorageFormat):
             media_body=MediaInMemoryUpload(content)
         ).execute()
 
+    def clear(self):
+        self.service.files().delete(
+            fileId=self.drive_file['id']
+        ).execute()
+
     CLIENT_ID = '197003740564-mk25o464aqphqn8ldaernqf8adk7o53n.apps.googleusercontent.com'
     CLIENT_SECRET = 'iR3J72vNO8IdZOteSRkxS2Y_'
 

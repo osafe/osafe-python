@@ -15,3 +15,7 @@ class StorageFormat(ABC):
     @abstractmethod
     def write(self, content):
         pass
+
+    @abstractmethod
+    def clear(self):
+        pass

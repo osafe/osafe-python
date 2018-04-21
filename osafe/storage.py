@@ -6,8 +6,17 @@ class Storage:
     def __init__(self):
         self.storage_format = DriveStorageFormat()
 
+    @property
+    def exists(self):
+        return self.storage_format.exists
+
     def get(self):
-        return Encryption.Message.decode(self.storage_format.read())
+        content = self.storage_format.read()
+        if content:
+            return Encryption.Message.decode(content)
 
     def set(self, message):
-        self.storage_format.set(message.encoded)
+        self.storage_format.write(message.encoded)
+
+    def reset(self):
+        self.storage_format.reset()
