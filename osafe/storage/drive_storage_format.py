@@ -33,14 +33,20 @@ class DriveStorageFormat(StorageFormat):
 
     def create(self, content):
         self._drive_file = self.service.files().create(
-            body={'name': self.FILENAME},
+            body={
+                'name': self.FILENAME,
+                'mimeType': 'application/json',
+            },
             media_body=MediaInMemoryUpload(content)
         ).execute()
 
     def update(self, content):
         self.service.files().update(
             fileId=self.drive_file['id'],
-            body={'name': self.FILENAME},
+            body={
+                'name': self.FILENAME,
+                'mimeType': 'application/json',
+            },
             media_body=MediaInMemoryUpload(content)
         ).execute()
 

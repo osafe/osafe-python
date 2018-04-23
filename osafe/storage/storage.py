@@ -1,5 +1,5 @@
-from .encryption import Encryption
-from .storage_formats.drive_storage_format import DriveStorageFormat
+from osafe.encryption.message import Message
+from .drive_storage_format import DriveStorageFormat
 
 
 class Storage:
@@ -13,7 +13,7 @@ class Storage:
     def get(self):
         content = self.storage_format.read()
         if content:
-            return Encryption.Message.decode(content)
+            return Message.decode(content)
 
     def set(self, message):
         self.storage_format.write(message.encoded)

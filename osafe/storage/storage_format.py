@@ -2,7 +2,7 @@ from abc import ABC, abstractproperty, abstractmethod
 
 
 class StorageFormat(ABC):
-    FILENAME = "osafe.enc"
+    FILENAME = "osafe.json"
 
     @abstractproperty
     def exists(self):
