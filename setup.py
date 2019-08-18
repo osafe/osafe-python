@@ -21,6 +21,7 @@ setup(
         'pycrypto',
         'google-api-python-client',
         'oauth2client',
+        'click',
     ],
     entry_points={
         'console_scripts': [

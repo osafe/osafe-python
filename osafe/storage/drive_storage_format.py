@@ -3,9 +3,9 @@ from cached_property import cached_property
 from googleapiclient.http import MediaInMemoryUpload
 from httplib2 import Http
 from oauth2client import file, client, tools
-import os
 
 from .storage_format import StorageFormat
+from ..config import Config
 
 
 class DriveStorageFormat(StorageFormat):
@@ -60,7 +60,7 @@ class DriveStorageFormat(StorageFormat):
 
     @cached_property
     def service(self):
-        store = file.Storage(os.path.expanduser("~/.osafe.json"))
+        store = file.Storage(Config.get().path("google-creds.json"))
         creds = store.get()
         if not creds or creds.invalid:
             flow = client.OAuth2WebServerFlow(

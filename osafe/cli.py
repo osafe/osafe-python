@@ -1,52 +1,32 @@
 #!/usr/bin/env python3
 
-from getpass import getpass
-from subprocess import check_call
-from tempfile import NamedTemporaryFile
-import os
+import click
 
-from .encryption import Encryption
-from .storage import Storage
+from .editor import Editor
+from .config import Config
 
 
-def main():
-    storage = Storage()
+@click.group(invoke_without_command=True)
+@click.pass_context
+def main(ctx):
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(edit)
 
-    message = storage.get()
-    content = None
 
-    while content is None:
-        if message:
-            passphrase = getpass("Enter your passphrase: ")
-        else:
-            passphrase = None
-            passphrase_confirmation = None
-            while not passphrase or passphrase != passphrase_confirmation:
-                passphrase = getpass("Enter your new passphrase: ")
-                passphrase_confirmation = getpass("Enter the same passphrase again: ")
+@main.command()
+def edit():
+    Editor().start()
 
-        encryption = Encryption(passphrase)
 
-        if message:
-            content = encryption.decrypt(message)
-        else:
-            content = ""
-
-    with NamedTemporaryFile(prefix="osafe-", mode='w+t', encoding='utf-8', newline='\n') as file:
-        file.write(content)
-        file.seek(0)
-
-        editor = os.environ.get('EDITOR')
-        if not editor:
-            print("EDITOR environment variable not set.")
-            while not editor:
-                editor = input("Type your preferred editor: ")
-
-        check_call([editor, file.name])
-
-        new_content = file.read()
-        if new_content != content:
-            storage.set(encryption.encrypt(new_content))
+@main.command()
+@click.option('-t', '--timeout', type=int, help="Timeout for the editor in minutes. Use '0' for no timeout. Defaults to '5'")
+def config(timeout):
+    if timeout is None:
+        print(Config.get().content)
+    else:
+        Config.get().write(
+            timeout=timeout,
+        )
 
 
 if __name__ == '__main__':
