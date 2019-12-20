@@ -1,6 +1,8 @@
+from contextlib import contextmanager
 from getpass import getpass
 from subprocess import Popen, TimeoutExpired
 from tempfile import NamedTemporaryFile
+from threading import Thread, Event
 import os
 
 from .encryption import Encryption
@@ -42,24 +44,52 @@ class Editor:
             file.write(self.content)
             file.seek(0)
 
-            editor = os.environ.get('EDITOR')
-            if not editor:
+            with self.start_monitoring(file):
+                process = Popen([self.editor, file.name])
+                try:
+                    process.wait(Config.get().read('timeout') * 60 or None)
+                except TimeoutExpired:
+                    process.kill()
+                    process.wait()
+                    self.clear()
+                    print("Editor timed out, killing and storing last saved content")
+
+    @property
+    def editor(self):
+        if not hasattr(self, '_editor'):
+            self._editor = os.environ.get('EDITOR')
+            if not self._editor:
                 print("EDITOR environment variable not set.")
-                while not editor:
-                    editor = input("Type your preferred editor: ")
+                while not self._editor:
+                    self._editor = input("Type your preferred editor: ")
+        return self._editor
 
-            process = Popen([editor, file.name])
-            try:
-                process.wait(Config.get().read('timeout') * 60 or None)
-            except TimeoutExpired:
-                process.kill()
-                process.wait()
-                self.clear()
-                print("Editor timed out, killing and storing last saved content")
+    @contextmanager
+    def start_monitoring(self, file):
+        stop_event = Event()
+        monitor_thread = Thread(target=self.monitor, args=(file, stop_event))
+        monitor_thread.start()
 
+        try:
+            yield
+        finally:
+            stop_event.set()
+            monitor_thread.join()
+
+    def monitor(self, file, stop_event):
+        last_mtime = os.stat(file.name).st_mtime
+        while not stop_event.is_set():
+            stop_event.wait(0.5)
+            new_mtime = os.stat(file.name).st_mtime
+            if new_mtime == last_mtime:
+                continue
+            new_mtime = last_mtime
             new_content = file.read()
-            if new_content != self.content:
-                self.storage.set(self.encryption.encrypt(new_content))
+            file.seek(0)
+            if new_content == self.content:
+                continue
+            self.content = new_content
+            self.storage.set(self.encryption.encrypt(new_content))
 
     def clear(self):
         if os.name != 'nt':

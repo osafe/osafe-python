@@ -9,7 +9,7 @@ except IOError:
 
 setup(
     name="osafe",
-    version="0.1.0",
+    version="1.0.0",
     description="A Python implementation of OSafe.",
     license="MIT",
     url="https://github.com/osafe/osafe-python",
