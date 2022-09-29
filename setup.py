@@ -9,7 +9,7 @@ except IOError:
 
 setup(
     name="osafe",
-    version="1.0.0",
+    version="1.0.1",
     description="A Python implementation of OSafe.",
     license="MIT",
     url="https://github.com/osafe/osafe-python",
@@ -18,7 +18,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'cached-property',
-        'pycrypto',
+        'pycryptodome',
         'google-api-python-client',
         'oauth2client',
         'click',

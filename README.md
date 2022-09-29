@@ -10,7 +10,7 @@ A Python implementation of OSafe.
 
 ```bash
 # use --user unless in virtual env
-pip3.6 install osafe --user
+pip3 install osafe --user
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ That's it!
 ## Distribute
 
 ```bash
-python3.6 -m venv venv
+python3 -m venv venv
 . venv/bin/activate
 
 pip install --upgrade pip setuptools wheel twine
